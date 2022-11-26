@@ -39,9 +39,9 @@ async function run() {
             res.send(products);
             
         });
-        app.get('/products/:category_id', async(req, res) =>{
-            const id = req.params.category_id
-            const query = { category_id : id}
+        app.get('/products/:category_name', async(req, res) =>{
+            const category_name = req.params.category_name
+            const query = { category_name: category_name}
             const product = await productsCollection.find(query).toArray()
             res.send(product)
         })
@@ -95,6 +95,12 @@ async function run() {
             const query = { email: email };
             const bookings = await bookingsCollection.find(query).toArray();
             res.send(bookings);
+        })
+
+        app.get('/categoryname', async(req, res) =>{
+            const query = {}
+            const result = await categoriesCollection.find(query).project({category_name: 1}).toArray()
+            res.send(result)
         })
     }
     finally {
