@@ -1,7 +1,7 @@
 const express = require('express')
 const cors = require('cors')
 const port = process.env.PORT || 5000
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express()
 require('dotenv').config();
 //middleware
@@ -60,16 +60,30 @@ async function run() {
 
         app.delete('/users/:id', async (req, res) =>{
             const id = req.params.id;
-            const filter = {_id : Object(id)}
+            const filter = {_id : ObjectId(id)}
             const result = await usersCollection.deleteOne(filter)
             res.send(result)
         })
 
         app.get('/users/admin/:email', async(req, res) =>{
             const email = req.params.email;
+            // console.log(email)
             const query = { email }
             const user = await usersCollection.findOne(query)
             res.send({isAdmin: user?.role === 'admin'})
+        })
+        app.get('/users/buyer/:email', async(req, res) =>{
+            const email = req.params.email;
+            const query = { email }
+            const buyerUser = await usersCollection.findOne(query)
+            res.send({isBuyer:  buyerUser?.role === 'Buyer'})
+        })
+        app.get('/users/seller/:email', async(req, res) =>{
+            const email = req.params.email;
+            console.log(email)
+            const query = { email }
+            const sellerUser = await usersCollection.findOne(query)
+            res.send({isSeller:  sellerUser?.role === 'Seller'})
         })
 
         app.post('/bookings', async(req, res) =>{
@@ -79,11 +93,6 @@ async function run() {
         })
         app.get('/bookings',  async (req, res) => {
             const email = req.query.email;
-            // const decodedEmail = req.decoded.email;
-
-            // if (email !== decodedEmail) {
-            //     return res.status(403).send({ message: 'forbidden access' });
-            // }
 
             const query = { email: email };
             const bookings = await bookingsCollection.find(query).toArray();
