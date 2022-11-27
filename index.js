@@ -39,6 +39,12 @@ async function run() {
             res.send(products);
             
         });
+        app.post('/products', async (req, res) => {
+            const product = req.body
+            const products = await productsCollection.insertOne(product);
+            res.send(products);
+            
+        });
         app.get('/products/:category_name', async(req, res) =>{
             const category_name = req.params.category_name
             const query = { category_name: category_name}
