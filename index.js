@@ -153,7 +153,7 @@ async function run() {
             const buyerUser = await usersCollection.findOne(query)
             res.send({isBuyer:  buyerUser?.role === 'Buyer'})
         })
-        app.get('/users/seller/:email', async(req, res) =>{
+        app.get('/users/seller/:email',  async(req, res) =>{
             const email = req.params.email;
             const query = { email }
             const sellerUser = await usersCollection.findOne(query)
@@ -205,7 +205,7 @@ async function run() {
 
         app.get('/bookings', verifyJWT, async (req, res) => {
             const email = req.query.email;
-            //  console.log('token', req.headers.authorization)
+             console.log('token', req.headers.authorization)
             const decodedEmail = req.decoded.email
             if (email !== decodedEmail) {
                 return res.status(403).send({ message: 'forbidden access' });
