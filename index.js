@@ -30,14 +30,14 @@ function verifyJWT(req, res, next) {
     }
 
     const token = authHeader.split(' ')[1];
-    // console.log(token)
+
 
     jwt.verify(token, process.env.ACCESS_TOKEN, function (err, decoded) {
         if (err) {
             return res.status(403).send({ message: 'forbidden access' })
         }
         req.decoded = decoded;
-        console.log(decoded)
+     
         next();
     })
 
@@ -170,7 +170,6 @@ async function run() {
             const id = req.params.id;
             const filter = { _id: ObjectId(id) }
             const result = await productsCollection.deleteOne(filter)
-
             res.send(result)
         })
    
@@ -197,8 +196,6 @@ async function run() {
 
         app.put("/users/seller/:email", verifyJWT, verifyAdmin, async (req, res) => {
             const email = req.params.email;
-            
-      
             const filter = { seller_email: email };
             const options = { upsert: true };
             const updatedDoc = {
@@ -224,7 +221,6 @@ async function run() {
 
         app.get('/bookings', verifyJWT, async (req, res) => {
             const email = req.query.email;
-
             const decodedEmail = req.decoded.email
             if (email !== decodedEmail) {
                 return res.status(403).send({ message: 'forbidden access' });
@@ -246,7 +242,6 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
             const booking = await bookingsCollection.findOne(query)
-
             res.send(booking)
         })
 
@@ -291,7 +286,6 @@ async function run() {
             const id = req.params.id;
             const query = { _id: ObjectId(id) }
             const booking = await whishlistCollection.findOne(query)
-
             res.send(booking)
         })
 
