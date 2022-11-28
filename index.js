@@ -52,6 +52,7 @@ async function run() {
         const bookingsCollection = client.db('used-products-resale').collection('bookings');
         const paymentsCollection = client.db('used-products-resale').collection('payments');
         const advertiseCollection = client.db('used-products-resale').collection('advertise');
+        const whishlistCollection = client.db('used-products-resale').collection('whishlist');
 
         const verifyAdmin = async (req, res, next) => {
             const decodedEmail = req.decoded.email;
@@ -108,10 +109,22 @@ async function run() {
    
         app.post('/advertise', async(req, res) =>{
             const product = req.body
-            console.log(product)
             const result = await advertiseCollection.insertOne(product)
-            console.log(result)
             res.send(result)
+        })
+
+        app.post('/wishlist', async(req, res) =>{
+            const wishlist = req.body
+            const result = await whishlistCollection.insertOne(wishlist)
+            res.send(result)
+        })
+
+        app.get('/wishlist', async(req, res) =>{
+            const email = req.query.email;
+            const query = { email: email };
+            const wishlist = await whishlistCollection.find(query).toArray();
+            res.send(wishlist);
+
         })
 
         app.get('/users', async(req, res) =>{
@@ -205,7 +218,7 @@ async function run() {
 
         app.get('/bookings', verifyJWT, async (req, res) => {
             const email = req.query.email;
-             console.log('token', req.headers.authorization)
+            
             const decodedEmail = req.decoded.email
             if (email !== decodedEmail) {
                 return res.status(403).send({ message: 'forbidden access' });
@@ -220,6 +233,8 @@ async function run() {
             const result = await categoriesCollection.find(query).project({category_name: 1}).toArray()
             res.send(result)
         })
+
+
         //payment system
         app.get('/bookings/:id', async(req, res) => {
             const id = req.params.id;
@@ -258,8 +273,22 @@ async function run() {
                 }
             }
             const updatedResult = await bookingsCollection.updateOne(filter, updatedDoc)
+            const updatedResult1 = await whishlistCollection.updateOne(filter, updatedDoc)
             res.send(result);
         })
+
+        // whislistpayment
+
+
+        app.get('/wishlist/:id', async(req, res) => {
+            const id = req.params.id;
+            const  query = {_id: ObjectId(id)}
+            const booking = await whishlistCollection.findOne(query)
+          
+            res.send(booking)
+        })
+
+        
 
         //jwt
         app.get('/jwt', async(req, res) =>{
