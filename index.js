@@ -126,18 +126,11 @@ async function run() {
         })
 
 
-        // // posting a advertise
-        // app.post("/advertiseProduct", async (req, res) => {
-        //     const product = req.body
-           
-        // });
-
+   
 
         app.get("/advertisedItems", async (req, res) => {
             const query = { advertised: true };
-            console.log(query)
             const advirtiseproducts = await productsCollection.find(query).toArray();
-            console.log(advertiseCollection)
             res.send(advirtiseproducts);
         });
 
@@ -200,41 +193,27 @@ async function run() {
             res.send({ isSeller: sellerUser?.role === 'Seller' })
         })
 
-        // app.get('/users/verify/:email', async(req, res) =>{
-        //     const email = req.params.email;
-        //     const query = { email }
-        //     const sellerVerify = await usersCollection.findOne(query)
-
-        //     // res.send({isVerify:  sellerVerify?.seller_verified === 'verified'})
-        //     res.send(sellerVerify)
-        // })
 
 
-        app.put('/users/seller/:id', verifyJWT, verifyAdmin, async (req, res) => {
-
-            const id = req.params.id;
-            const filter = { _id: ObjectId(id) }
-            const options = { upsert: true }
+        app.put("/users/seller/:email", verifyJWT, verifyAdmin, async (req, res) => {
+            const email = req.params.email;
+            
+      
+            const filter = { seller_email: email };
+            const options = { upsert: true };
             const updatedDoc = {
-                $set: {
-                    seller_verified: 'verified'
-                }
-            }
-            const result = await usersCollection.updateOne(filter, updatedDoc, options)
-            res.send(result)
-        })
-
-
-
-        // app.get('/verify', async(req, res) => {
-        //     const email = req.query.email
-        //     const filter = {email : email}
-        //     console.log(filter)
-        //     const result = await usersCollection.findOne(filter)
-        //     console.log(result)
-        //     res.send(result)
-        // })
-
+              $set: {
+                seller_state: "verified",
+              },
+            };
+            const result = await productsCollection.updateMany(
+              filter,
+              updatedDoc,
+              options
+            );
+            res.send(result);
+          });
+      
 
 
         app.post('/bookings', async (req, res) => {
