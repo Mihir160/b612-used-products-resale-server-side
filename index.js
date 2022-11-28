@@ -51,6 +51,7 @@ async function run() {
         const usersCollection = client.db('used-products-resale').collection('users');
         const bookingsCollection = client.db('used-products-resale').collection('bookings');
         const paymentsCollection = client.db('used-products-resale').collection('payments');
+        const paymentswishlistCollection = client.db('used-products-resale').collection('wishlistpayment');
         const advertiseCollection = client.db('used-products-resale').collection('advertise');
         const whishlistCollection = client.db('used-products-resale').collection('whishlist');
 
@@ -273,13 +274,13 @@ async function run() {
                 }
             }
             const updatedResult = await bookingsCollection.updateOne(filter, updatedDoc)
-            const updatedResult1 = await whishlistCollection.updateOne(filter, updatedDoc)
+          
             res.send(result);
         })
 
         // whislistpayment
 
-        
+
 
         app.get('/wishlist/:id', async(req, res) => {
             const id = req.params.id;
@@ -288,9 +289,32 @@ async function run() {
           
             res.send(booking)
         })
+      
 
+        app.post('/wishlistpayments', async(req, res) =>{
+            const payment = req.body
+            const result = await paymentswishlistCollection.insertOne(payment)
+            const id = payment.bookingId
+            const filter = {_id: ObjectId(id)}
+            const updatedDoc = {
+                $set: {
+                    paid: true,
+                    transactionId: payment.transactionId
+                }
+            }
+          
+            const updatedResult = await whishlistCollection.updateOne(filter, updatedDoc)
+            res.send(result);
+        })
         
-
+        // delete products
+        app.delete('/productsdelete/:id', async (req, res) =>{
+            const id = req.params.id;
+            const filter = {_id : ObjectId(id)}
+            const result = await productsCollection.deleteOne(filter)
+            res.send(result)
+        })
+ 
         //jwt
         app.get('/jwt', async(req, res) =>{
             const email = req.query.email
